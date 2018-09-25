@@ -1,0 +1,88 @@
+
+```{r}
+install.packages("gapminder")
+library(dplyr)
+library(gapminder)
+head(gapminder)
+```
+1. How many unique countries are represented per continent?
+```{r}
+gapminder %>%
+  group_by(continent) %>% #divide data by continents 
+   summarise(countriesunique = n_distinct(country)) #create a new variable countriesunique that has all the unique countries and then summarizes into a single table
+```
+
+2. Which European nation had the lowest GDP per capita in 1997?
+```{r}
+gapminder %>%
+  filter(continent == "Europe" & year == "1997") %>% #filters by countries only in Europe and year that matches 1997
+  slice(which.min(gdpPercap)) #which nation had lowest GDP per capita 
+```
+
+3. According to the data available, what was the average life expectancy across each continent in the 1980s?
+```{r}
+gapminder %>%
+  group_by(continent) %>% #separate data by continents 
+  filter(year >= 1980 & year <= 1989) %>% #filters by continents from 1980 to 1989 
+  summarise(avglife = mean(lifeExp)) #create a new variable avglife that has all the average life expectancy of each continent and puts in a single summary
+```
+
+4. What 5 countries have the highest total GDP over all years combined?
+```{r}
+gapminder %>% 
+  group_by(country) %>% #separates data by countries 
+  summarise(combinedGDP = sum(gdpPercap)) %>% #creates new variable combinedGDP that is the sum of GDP over all year combined
+  arrange(desc(combinedGDP)) %>% #arranges the data in descending order from country with highest total GDP 
+  head(5) #prints the 5 countries with the highes total GDP
+```
+
+5. What countries and years had life expectancies of at least 80 years? N.b. only output the columns of interest: country, life expectancy and year (in that order).
+```{r}
+gapminder %>%
+  group_by(country) %>% #separate data by countries
+  filter(lifeExp >= 80) %>% #filters by countries with life expectancy of at least 80 years
+  select(country, lifeExp, year) #displays columns of interest in the order country, life expectancy and year 
+```
+
+6. What 10 countries have the strongest correlation (in either direction) between life expectancy and per capita GDP?
+```{r}
+gapminder %>%
+  group_by(country) %>% #separates data by countries
+  summarise(correlation = abs(cor(lifeExp, gdpPercap))) %>% #creates new variable correlation that takes absolute value (so direction doesn't matter) of correlation between life expectancy and per capita GDP 
+  arrange((desc(correlation))) #arranges the data in descending order
+```
+
+7. Which combinations of continent (besides Asia) and year have the highest average population across all countries? N.b. your output should include all results sorted by highest average population. With what you already know, this one may stump you. See this Q&A for how to ungroup before arrangeing. This also behaves differently in more recent versions of dplyr.
+```{r}
+gapminder %>%
+  filter(continent != "Asia") %>% #to exclude Asia from results
+  group_by(continent, year) %>% #group by continent and year 
+  summarise(averagepop = mean(pop)) %>% #creates new variable averagepop to equal the average population 
+  ungroup() %>% #remove grouping
+  arrange(desc(averagepop)) #arranges the data in descending order starting from combination of continent and year by highest average population 
+```
+
+8. Which three countries have had the most consistent population estimates (i.e. lowest standard deviation) across the years of available data?
+```{r}
+gapminder %>%
+  group_by(country) %>% #divide data by country
+  summarise(standevpopulation = sd(pop)) %>% #creates new variable standevpopulation to equal standard deviation of the population
+  arrange(standevpopulation) %>% #arrange the standard deviation of population from lowest to highest
+  head(3) #display the first three lowest standard deviations 
+```
+
+9. Subset gm to only include observations from 1992 and store the results as gm1992. What kind of object is this?
+```{r}
+gm1992 <- gapminder %>%
+  filter(year == "1992") #subset gm to only include observations from 1992 and stored as gm1992
+head(gm1992)
+typeof(gm1992) #gm1992 is a list 
+```
+
+10. Which observations indicate that the population of a country has decreased from the previous year and the life expectancy has increased from the previous year? See the vignette on window functions.
+```{r}
+gapminder %>%
+  group_by(country) %>% #divide the data by countries
+  filter(pop < lag(pop) & lifeExp > lag(lifeExp)) #filter by opulation has decreased from previous year and life expectancy has increased
+#36 countries fit this criteria 
+```
