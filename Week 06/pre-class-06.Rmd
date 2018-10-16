@@ -1,0 +1,56 @@
+---
+title: "pre-class-06"
+output: html_document
+---
+
+Make sure you commit this often with meaningful messages.
+
+knitr::opts_chunk$set(echo = TRUE)
+1. Read the source code for each of the following three functions, puzzle out what they do, and then brainstorm better names.
+```{r}
+haveprefix <- function(string, prefix) {
+  substr(string, 1, nchar(prefix)) == prefix
+}
+haveprefix("hello my name is amy", "hello")
+
+
+deletelast <- function(x) {
+  if (length(x) <= 1) return(NULL)
+  x[-length(x)]
+}
+deletelast(c(1,0,2,3,4,9,30,2,3))
+
+repeatlength<- function(x, y) {
+  rep(y, length.out = length(x))
+}
+
+repeatlength(c(1,20,3,4), c(1,2,3,3,33))
+```
+
+2. Compare and contrast rnorm() and MASS::mvrnorm(). How could you make them more consistent?
+rnorm() generates random samples from a univariate normal distribution. mvrnorm() generates random samples from a multivariate normal distribution. The argument for rnorm() includes n, mean and sd. The argument for mvrnorm() includes n, mu and sigma. They both sample from a normal distribution and they both take in n, the number of observations. To make rnorm() and mvrnorm() more consistent, I would make the names of the arguments for mvnorm() the same as the name of the arguments for rnorm().  
+
+3. Use lapply() and an anonymous function to find the coefficient of variation (the standard deviation divided by the mean) for all columns in the mtcars dataset.
+```{r}
+library(dplyr)
+coeffVariation <- lapply(mtcars, function(i) sd(i)/mean(i))
+```
+
+
+4. Use vapply() to: 
+
+a. Compute the standard deviation of every column in a numeric data frame. 
+```{r}
+class(df) #check the class
+columnsd <- function(df) {
+  vapply(df, sd, numeric(1))
+}
+```
+
+b. Compute the standard deviation of every numeric column in a mixed data frame. (Hint: you’ll need to use vapply() twice.)
+```{r}
+class(df) #check the class 
+sd_numcol <- function(df) {
+  vapply(df[vapply(df, is.numeric, logical(1))], sd, numeric(1))
+}
+```
